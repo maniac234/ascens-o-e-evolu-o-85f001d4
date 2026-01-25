@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   Flame, 
   Zap, 
@@ -89,18 +89,46 @@ const initialMissions: Mission[] = [
   { id: "m1", title: "Ler por 30 minutos", points: 45, completed: false, category: "mental" },
   { id: "m2", title: "Aprender algo novo", points: 50, completed: false, category: "mental" },
   
-  // Spiritual
-  { id: "s1", title: "Meditar por 15 minutos", points: 40, completed: false, category: "spiritual" },
-  { id: "s2", title: "Reflexão sobre propósito", points: 35, completed: false, category: "spiritual" },
+  // Spiritual - Reiki e Devocionais
+  { id: "s1", title: "Reiki", points: 35, completed: false, category: "spiritual" },
+  { id: "s2", title: "Reiki para Casa", points: 10, completed: false, category: "spiritual" },
+  { id: "s3", title: "Reiki para Pais ou Alguém Específico", points: 10, completed: false, category: "spiritual" },
+  { id: "s4", title: "Reiki para Comunidade Carente", points: 20, completed: false, category: "spiritual" },
+  { id: "s5", title: "Devocional", points: 25, completed: false, category: "spiritual" },
+  { id: "s6", title: "Asha Music", points: 25, completed: false, category: "spiritual" },
   
   // Intraphysical
   { id: "i1", title: "Completar tarefa de trabalho", points: 60, completed: false, category: "intraphysical" },
   { id: "i2", title: "Conectar com um amigo", points: 40, completed: false, category: "intraphysical" },
 ];
 
+const STORAGE_KEY = "ascencao-missions";
+const LAST_RESET_KEY = "ascencao-last-reset";
+
 const Index = () => {
-  const [missions, setMissions] = useState<Mission[]>(initialMissions);
+  const [missions, setMissions] = useState<Mission[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    return saved ? JSON.parse(saved) : initialMissions;
+  });
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+
+  // Renovação diária das missões a cada 24 horas
+  useEffect(() => {
+    const lastReset = localStorage.getItem(LAST_RESET_KEY);
+    const now = new Date();
+    const today = now.toDateString();
+    
+    if (lastReset !== today) {
+      // Reseta todas as missões para não concluídas
+      setMissions(initialMissions);
+      localStorage.setItem(LAST_RESET_KEY, today);
+    }
+  }, []);
+
+  // Salva missões no localStorage
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(missions));
+  }, [missions]);
 
   const toggleMission = (id: string) => {
     setMissions(missions.map(m => 

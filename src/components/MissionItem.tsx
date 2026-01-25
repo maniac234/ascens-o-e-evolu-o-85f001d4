@@ -58,9 +58,9 @@ const MissionItem = ({ title, points, completed, category, onToggle }: MissionIt
         {title}
       </span>
 
-      <div className="flex items-center gap-1 text-primary">
+      <div className={`flex items-center gap-1 ${points < 0 ? 'text-red-500' : 'text-primary'}`}>
         <Star className="w-4 h-4" />
-        <span className="font-display text-sm font-semibold">+{points}</span>
+        <span className="font-display text-sm font-semibold">{points > 0 ? '+' : ''}{points}</span>
       </div>
     </button>
   );
