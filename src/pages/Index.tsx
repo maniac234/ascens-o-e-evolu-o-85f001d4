@@ -63,21 +63,30 @@ const categories = [
 ];
 
 const initialMissions: Mission[] = [
-  // Physical
-  { id: "p1", title: "Fazer 30 minutos de exercício", points: 50, completed: false, category: "physical" },
-  { id: "p2", title: "Beber 2 litros de água", points: 30, completed: true, category: "physical" },
-  { id: "p3", title: "Dormir 8 horas", points: 40, completed: false, category: "physical" },
+  // Physical - Musculação e Exercícios
+  { id: "p1", title: "Musculação Peito", points: 50, completed: false, category: "physical" },
+  { id: "p2", title: "Musculação Peito + Abdômen", points: 75, completed: false, category: "physical" },
+  { id: "p3", title: "Treino de MMA + Abdômen", points: 70, completed: false, category: "physical" },
+  { id: "p4", title: "Musculação Bike + Perna", points: 80, completed: false, category: "physical" },
+  { id: "p5", title: "Musculação Costas na Academia", points: 75, completed: false, category: "physical" },
+  { id: "p6", title: "Musculação Ombro e Trapézio", points: 85, completed: false, category: "physical" },
+  { id: "p7", title: "Musculação Braços Completos", points: 85, completed: false, category: "physical" },
+  { id: "p8", title: "Corrida na Rua + Sol", points: 90, completed: false, category: "physical" },
   
-  // Energetic
-  { id: "e1", title: "Praticar respiração consciente", points: 35, completed: false, category: "energetic" },
-  { id: "e2", title: "Tomar sol por 15 minutos", points: 25, completed: true, category: "energetic" },
+  // Energetic - OLVEs e Práticas
+  { id: "e1", title: "OLVEs na Cadeira", points: 40, completed: false, category: "energetic" },
+  { id: "e2", title: "OLVEs no Pátio", points: 60, completed: false, category: "energetic" },
+  { id: "e3", title: "OLVEs Deitado", points: 30, completed: false, category: "energetic" },
+  { id: "e4", title: "10 x 20 OLVEs por Dia", points: 60, completed: false, category: "energetic" },
+  { id: "e5", title: "Abstinência Diária", points: 40, completed: false, category: "energetic" },
+  { id: "e6", title: "1 Prática (penalidade)", points: -40, completed: false, category: "energetic" },
   
   // Emotional
   { id: "em1", title: "Praticar gratidão diária", points: 40, completed: false, category: "emotional" },
   { id: "em2", title: "Expressar um sentimento", points: 35, completed: false, category: "emotional" },
   
   // Mental
-  { id: "m1", title: "Ler por 30 minutos", points: 45, completed: true, category: "mental" },
+  { id: "m1", title: "Ler por 30 minutos", points: 45, completed: false, category: "mental" },
   { id: "m2", title: "Aprender algo novo", points: 50, completed: false, category: "mental" },
   
   // Spiritual
@@ -85,7 +94,7 @@ const initialMissions: Mission[] = [
   { id: "s2", title: "Reflexão sobre propósito", points: 35, completed: false, category: "spiritual" },
   
   // Intraphysical
-  { id: "i1", title: "Completar tarefa de trabalho", points: 60, completed: true, category: "intraphysical" },
+  { id: "i1", title: "Completar tarefa de trabalho", points: 60, completed: false, category: "intraphysical" },
   { id: "i2", title: "Conectar com um amigo", points: 40, completed: false, category: "intraphysical" },
 ];
 
