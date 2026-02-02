@@ -1,30 +1,37 @@
 import { Check, Circle, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Category } from "@/types/missions";
 
 interface MissionItemProps {
   title: string;
   points: number;
   completed: boolean;
-  category: "physical" | "energetic" | "emotional" | "mental" | "spiritual" | "intraphysical";
+  category: Category;
   onToggle?: () => void;
 }
 
-const categoryBorder = {
+const categoryBorder: Record<Category, string> = {
   physical: "border-category-physical/30",
   energetic: "border-category-energetic/30",
-  emotional: "border-category-emotional/30",
+  astralBody: "border-category-astralBody/30",
   mental: "border-category-mental/30",
   spiritual: "border-category-spiritual/30",
   intraphysical: "border-category-intraphysical/30",
+  practices: "border-category-practices/30",
+  candles: "border-category-candles/30",
+  astral: "border-category-astral/30",
 };
 
-const categoryCheck = {
+const categoryCheck: Record<Category, string> = {
   physical: "bg-category-physical text-background",
   energetic: "bg-category-energetic text-background",
-  emotional: "bg-category-emotional text-background",
+  astralBody: "bg-category-astralBody text-background",
   mental: "bg-category-mental text-background",
   spiritual: "bg-category-spiritual text-background",
   intraphysical: "bg-category-intraphysical text-background",
+  practices: "bg-category-practices text-background",
+  candles: "bg-category-candles text-background",
+  astral: "bg-category-astral text-background",
 };
 
 const MissionItem = ({ title, points, completed, category, onToggle }: MissionItemProps) => {

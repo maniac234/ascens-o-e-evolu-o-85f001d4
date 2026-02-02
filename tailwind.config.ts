@@ -59,10 +59,13 @@ export default {
         category: {
           physical: "hsl(var(--physical))",
           energetic: "hsl(var(--energetic))",
-          emotional: "hsl(var(--emotional))",
+          astralBody: "hsl(var(--astral-body))",
           mental: "hsl(var(--mental))",
           spiritual: "hsl(var(--spiritual))",
           intraphysical: "hsl(var(--intraphysical))",
+          practices: "hsl(var(--practices))",
+          candles: "hsl(var(--candles))",
+          astral: "hsl(var(--astral))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",

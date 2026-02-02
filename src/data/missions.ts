@@ -2,7 +2,7 @@ import { Mission, Category } from "@/types/missions";
 import { 
   Flame, 
   Zap, 
-  Heart, 
+  Ghost, 
   Brain, 
   Sparkles, 
   Users,
@@ -21,6 +21,7 @@ export const initialMissions: Mission[] = [
   { id: "p6", title: "Musculação Ombro e Trapézio", points: 85, completed: false, category: "physical" },
   { id: "p7", title: "Musculação Braços Completos", points: 85, completed: false, category: "physical" },
   { id: "p8", title: "Corrida na Rua + Sol", points: 90, completed: false, category: "physical" },
+  { id: "p9", title: "MMA", points: 50, completed: false, category: "physical" },
   
   // Energetic - OLVEs e Práticas
   { id: "e1", title: "OLVEs na Cadeira", points: 40, completed: false, category: "energetic" },
@@ -30,9 +31,9 @@ export const initialMissions: Mission[] = [
   { id: "e5", title: "Abstinência Diária", points: 40, completed: false, category: "energetic" },
   { id: "e6", title: "1 Prática (penalidade)", points: -40, completed: false, category: "energetic" },
   
-  // Emotional
-  { id: "em1", title: "Praticar gratidão diária", points: 40, completed: false, category: "emotional" },
-  { id: "em2", title: "Expressar um sentimento", points: 35, completed: false, category: "emotional" },
+  // Astral Body (antigo Emotional)
+  { id: "ab1", title: "Registrar insight astral", points: 40, completed: false, category: "astralBody" },
+  { id: "ab2", title: "Análise de mecanismo astral", points: 35, completed: false, category: "astralBody" },
   
   // Mental - Updated
   { id: "m1", title: "Leitura diária", points: 45, completed: false, category: "mental" },
@@ -40,6 +41,8 @@ export const initialMissions: Mission[] = [
   { id: "m3", title: "Curso", points: 70, completed: false, category: "mental" },
   { id: "m4", title: "Concentração (Dharana) - 10 min", points: 100, completed: false, category: "mental" },
   { id: "m5", title: "Meditação (Dhyana) - 5 min silêncio", points: 170, completed: false, category: "mental" },
+  { id: "m6", title: "Xadrez", points: 50, completed: false, category: "mental" },
+  { id: "m7", title: "StarCraft", points: 50, completed: false, category: "mental" },
   
   // Spiritual - Reiki e Devocionais
   { id: "s1", title: "Reiki", points: 35, completed: false, category: "spiritual" },
@@ -74,10 +77,10 @@ export const categories = [
     icon: Zap,
   },
   {
-    id: "emotional" as Category,
-    title: "Emocional",
-    description: "Equilíbrio e inteligência emocional",
-    icon: Heart,
+    id: "astralBody" as Category,
+    title: "Corpo Astral",
+    description: "Sentimentos e matéria astral",
+    icon: Ghost,
   },
   {
     id: "mental" as Category,

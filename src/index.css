@@ -53,10 +53,13 @@
     /* Category colors */
     --physical: 0 85% 55%;
     --energetic: 30 100% 50%;
-    --emotional: 320 80% 55%;
+    --astral-body: 280 70% 50%;
     --mental: 200 100% 50%;
     --spiritual: 270 80% 60%;
     --intraphysical: 150 70% 45%;
+    --practices: 0 70% 50%;
+    --candles: 45 100% 50%;
+    --astral: 240 60% 60%;
 
     --sidebar-background: 0 0% 6%;
     --sidebar-foreground: 45 100% 95%;
@@ -163,8 +166,11 @@
 
   .category-physical { --category-color: var(--physical); }
   .category-energetic { --category-color: var(--energetic); }
-  .category-emotional { --category-color: var(--emotional); }
+  .category-astral-body { --category-color: var(--astral-body); }
   .category-mental { --category-color: var(--mental); }
   .category-spiritual { --category-color: var(--spiritual); }
   .category-intraphysical { --category-color: var(--intraphysical); }
+  .category-practices { --category-color: var(--practices); }
+  .category-candles { --category-color: var(--candles); }
+  .category-astral { --category-color: var(--astral); }
 }
