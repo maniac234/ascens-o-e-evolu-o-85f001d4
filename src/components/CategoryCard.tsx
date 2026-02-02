@@ -1,5 +1,6 @@
 import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Category } from "@/types/missions";
 
 interface CategoryCardProps {
   title: string;
@@ -8,35 +9,44 @@ interface CategoryCardProps {
   points: number;
   completedMissions: number;
   totalMissions: number;
-  category: "physical" | "energetic" | "emotional" | "mental" | "spiritual" | "intraphysical";
+  category: Category;
   onClick?: () => void;
 }
 
-const categoryStyles = {
+const categoryStyles: Record<Category, string> = {
   physical: "bg-category-physical/10 border-category-physical/30 hover:bg-category-physical/20",
   energetic: "bg-category-energetic/10 border-category-energetic/30 hover:bg-category-energetic/20",
-  emotional: "bg-category-emotional/10 border-category-emotional/30 hover:bg-category-emotional/20",
+  astralBody: "bg-category-astralBody/10 border-category-astralBody/30 hover:bg-category-astralBody/20",
   mental: "bg-category-mental/10 border-category-mental/30 hover:bg-category-mental/20",
   spiritual: "bg-category-spiritual/10 border-category-spiritual/30 hover:bg-category-spiritual/20",
   intraphysical: "bg-category-intraphysical/10 border-category-intraphysical/30 hover:bg-category-intraphysical/20",
+  practices: "bg-category-practices/10 border-category-practices/30 hover:bg-category-practices/20",
+  candles: "bg-category-candles/10 border-category-candles/30 hover:bg-category-candles/20",
+  astral: "bg-category-astral/10 border-category-astral/30 hover:bg-category-astral/20",
 };
 
-const iconStyles = {
+const iconStyles: Record<Category, string> = {
   physical: "text-category-physical",
   energetic: "text-category-energetic",
-  emotional: "text-category-emotional",
+  astralBody: "text-category-astralBody",
   mental: "text-category-mental",
   spiritual: "text-category-spiritual",
   intraphysical: "text-category-intraphysical",
+  practices: "text-category-practices",
+  candles: "text-category-candles",
+  astral: "text-category-astral",
 };
 
-const progressStyles = {
+const progressStyles: Record<Category, string> = {
   physical: "bg-category-physical",
   energetic: "bg-category-energetic",
-  emotional: "bg-category-emotional",
+  astralBody: "bg-category-astralBody",
   mental: "bg-category-mental",
   spiritual: "bg-category-spiritual",
   intraphysical: "bg-category-intraphysical",
+  practices: "bg-category-practices",
+  candles: "bg-category-candles",
+  astral: "bg-category-astral",
 };
 
 const CategoryCard = ({

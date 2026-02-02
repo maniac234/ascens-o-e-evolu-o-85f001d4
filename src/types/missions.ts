@@ -2,7 +2,7 @@
 export type Category = 
   | "physical" 
   | "energetic" 
-  | "emotional" 
+  | "astralBody"  // Renamed from emotional
   | "mental" 
   | "spiritual" 
   | "intraphysical"
@@ -26,8 +26,10 @@ export interface DailyLog {
   practiceSelected?: "practice1" | "practice2" | "practice3" | null;
   runningKm: number;
   punches: number;
+  clonaDrops: number; // gotas de clona
   candleIntentions: CandleIntention[];
   astralInsights: string[];
+  astralBodyInsights: AstralBodyInsight[]; // new
 }
 
 export interface CompletedMission {
@@ -39,9 +41,17 @@ export interface CompletedMission {
 }
 
 export interface CandleIntention {
+  id?: string;
   color: CandleColor;
   intention: string;
   completedAt: string;
+}
+
+export interface AstralBodyInsight {
+  id: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export type CandleColor = 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { DailyLog, CompletedMission, CandleIntention, CandleColor } from "@/types/missions";
+import { DailyLog, CompletedMission, CandleIntention, CandleColor, AstralBodyInsight } from "@/types/missions";
 import { getCurrentDateKey, useDailyReset } from "./useDailyReset";
 
 const LOGS_STORAGE_KEY = "ascencao-daily-logs";
@@ -12,8 +12,10 @@ function getEmptyLog(date: string): DailyLog {
     practiceSelected: null,
     runningKm: 0,
     punches: 0,
+    clonaDrops: 0,
     candleIntentions: [],
     astralInsights: [],
+    astralBodyInsights: [],
   };
 }
 
@@ -121,11 +123,17 @@ export function useDailyLog() {
     updateTodayLog({ punches: Math.min(1000, Math.max(0, count)) });
   }, [updateTodayLog]);
   
+  // Update clona drops
+  const updateClonaDrops = useCallback((count: number) => {
+    updateTodayLog({ clonaDrops: Math.min(50, Math.max(0, count)) });
+  }, [updateTodayLog]);
+  
   // Add candle intention
   const addCandleIntention = useCallback((color: CandleColor, intention: string) => {
     setAllLogs(prev => {
       const currentLog = prev[currentDateKey] || getEmptyLog(currentDateKey);
       const newIntention: CandleIntention = {
+        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         color,
         intention,
         completedAt: new Date().toISOString(),
@@ -141,6 +149,22 @@ export function useDailyLog() {
     });
   }, [currentDateKey]);
   
+  // Update candle intention
+  const updateCandleIntention = useCallback((id: string, intention: string) => {
+    setAllLogs(prev => {
+      const logs = { ...prev };
+      Object.keys(logs).forEach(dateKey => {
+        logs[dateKey] = {
+          ...logs[dateKey],
+          candleIntentions: logs[dateKey].candleIntentions.map(ci =>
+            ci.id === id ? { ...ci, intention } : ci
+          ),
+        };
+      });
+      return logs;
+    });
+  }, []);
+  
   // Add astral insight
   const addAstralInsight = useCallback((insight: string) => {
     setAllLogs(prev => {
@@ -154,6 +178,70 @@ export function useDailyLog() {
       };
     });
   }, [currentDateKey]);
+  
+  // Add astral body insight
+  const addAstralBodyInsight = useCallback((content: string) => {
+    setAllLogs(prev => {
+      const currentLog = prev[currentDateKey] || getEmptyLog(currentDateKey);
+      const newInsight: AstralBodyInsight = {
+        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        content,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      return {
+        ...prev,
+        [currentDateKey]: {
+          ...currentLog,
+          astralBodyInsights: [...currentLog.astralBodyInsights, newInsight],
+        },
+      };
+    });
+  }, [currentDateKey]);
+  
+  // Update astral body insight
+  const updateAstralBodyInsight = useCallback((id: string, content: string) => {
+    setAllLogs(prev => {
+      const logs = { ...prev };
+      Object.keys(logs).forEach(dateKey => {
+        logs[dateKey] = {
+          ...logs[dateKey],
+          astralBodyInsights: (logs[dateKey].astralBodyInsights || []).map(i =>
+            i.id === id ? { ...i, content, updatedAt: new Date().toISOString() } : i
+          ),
+        };
+      });
+      return logs;
+    });
+  }, []);
+  
+  // Get all insights (candles + astral body)
+  const getAllInsights = useCallback(() => {
+    const allInsights: { type: 'candle' | 'astralBody'; id: string; content: string; date: string; color?: string }[] = [];
+    
+    Object.values(allLogs).forEach(log => {
+      log.candleIntentions.forEach(ci => {
+        allInsights.push({
+          type: 'candle',
+          id: ci.id || ci.completedAt,
+          content: ci.intention,
+          date: log.date,
+          color: ci.color,
+        });
+      });
+      
+      (log.astralBodyInsights || []).forEach(i => {
+        allInsights.push({
+          type: 'astralBody',
+          id: i.id,
+          content: i.content,
+          date: log.date,
+        });
+      });
+    });
+    
+    return allInsights.sort((a, b) => b.date.localeCompare(a.date));
+  }, [allLogs]);
   
   // Get sorted logs (most recent first)
   const getSortedLogs = useCallback((): DailyLog[] => {
@@ -176,8 +264,13 @@ export function useDailyLog() {
     selectPractice,
     updateRunningKm,
     updatePunches,
+    updateClonaDrops,
     addCandleIntention,
+    updateCandleIntention,
     addAstralInsight,
+    addAstralBodyInsight,
+    updateAstralBodyInsight,
+    getAllInsights,
     getSortedLogs,
     getLogsForRange,
   };

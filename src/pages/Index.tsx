@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { ArrowLeft, Sparkles } from "lucide-react";
+import { ArrowLeft, Sparkles, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import ScoreDisplay from "@/components/ScoreDisplay";
@@ -10,6 +10,7 @@ import PhysicalProgress from "@/components/PhysicalProgress";
 import PracticeSelector from "@/components/PracticeSelector";
 import CandleRituals from "@/components/CandleRituals";
 import AstralInsights from "@/components/AstralInsights";
+import AstralBodyProgress from "@/components/AstralBodyProgress";
 import { useDailyLog } from "@/hooks/useDailyLog";
 import { categories, initialMissions } from "@/data/missions";
 import { Mission, Category } from "@/types/missions";
@@ -32,8 +33,10 @@ const Index = () => {
     selectPractice,
     updateRunningKm,
     updatePunches,
+    updateClonaDrops,
     addCandleIntention,
     addAstralInsight,
+    addAstralBodyInsight,
     getSortedLogs,
     currentDateKey,
   } = useDailyLog();
@@ -156,6 +159,17 @@ const Index = () => {
                 </div>
               )}
 
+              {selectedCategory === "astralBody" && (
+                <div className="mb-6">
+                  <AstralBodyProgress 
+                    clonaDrops={todayLog.clonaDrops} 
+                    insights={todayLog.astralBodyInsights || []} 
+                    onUpdateClonaDrops={updateClonaDrops} 
+                    onAddInsight={addAstralBodyInsight} 
+                  />
+                </div>
+              )}
+
               {selectedCategory === "practices" && (
                 <div className="mb-6">
                   <PracticeSelector selectedPractice={todayLog.practiceSelected || null} onSelect={selectPractice} />
@@ -189,7 +203,7 @@ const Index = () => {
                 ))}
               </div>
 
-              {filteredMissions.length === 0 && selectedCategory !== "practices" && selectedCategory !== "candles" && (
+              {filteredMissions.length === 0 && selectedCategory !== "practices" && selectedCategory !== "candles" && selectedCategory !== "astralBody" && (
                 <div className="text-center py-12 text-muted-foreground">
                   <p>Nenhuma missão disponível nesta categoria.</p>
                 </div>

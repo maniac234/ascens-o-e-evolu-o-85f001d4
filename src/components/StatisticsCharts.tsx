@@ -17,7 +17,7 @@ interface StatisticsChartsProps {
 const CATEGORY_COLORS: Record<Category, string> = {
   physical: "hsl(0, 85%, 55%)",
   energetic: "hsl(30, 100%, 50%)",
-  emotional: "hsl(320, 80%, 55%)",
+  astralBody: "hsl(280, 70%, 50%)",
   mental: "hsl(200, 100%, 50%)",
   spiritual: "hsl(270, 80%, 60%)",
   intraphysical: "hsl(150, 70%, 45%)",
@@ -29,7 +29,7 @@ const CATEGORY_COLORS: Record<Category, string> = {
 const CATEGORY_LABELS: Record<Category, string> = {
   physical: "Autodesenv. Físico",
   energetic: "Energética",
-  emotional: "Emocional",
+  astralBody: "Corpo Astral",
   mental: "Mental",
   spiritual: "Espiritual",
   intraphysical: "Intrafísica",

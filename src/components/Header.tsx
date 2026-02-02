@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import Logo from "./Logo";
 import { Settings } from "lucide-react";
 import NotificationDropdown from "./NotificationDropdown";
@@ -16,9 +17,9 @@ const Header = ({ logs = [] }: HeaderProps) => {
           
           <div className="flex items-center gap-2">
             <NotificationDropdown logs={logs} />
-            <button className="p-2 rounded-lg hover:bg-muted transition-colors">
+            <Link to="/insights" className="p-2 rounded-lg hover:bg-muted transition-colors">
               <Settings className="w-5 h-5 text-muted-foreground" />
-            </button>
+            </Link>
           </div>
         </div>
       </div>

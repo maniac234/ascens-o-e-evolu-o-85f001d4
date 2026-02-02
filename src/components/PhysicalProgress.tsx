@@ -1,7 +1,4 @@
-import { useState } from "react";
-import { Progress } from "@/components/ui/progress";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
 import { PersonStanding, Target } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -18,19 +15,6 @@ const PhysicalProgress = ({
   onUpdateRunning,
   onUpdatePunches,
 }: PhysicalProgressProps) => {
-  const [runningInput, setRunningInput] = useState(runningKm.toString());
-  const [punchesInput, setPunchesInput] = useState(punches.toString());
-  
-  const handleRunningSubmit = () => {
-    const value = parseFloat(runningInput) || 0;
-    onUpdateRunning(Math.min(5, Math.max(0, value)));
-  };
-  
-  const handlePunchesSubmit = () => {
-    const value = parseInt(punchesInput) || 0;
-    onUpdatePunches(Math.min(1000, Math.max(0, value)));
-  };
-  
   return (
     <div className="space-y-6 p-4 bg-card border border-border rounded-xl">
       <h3 className="font-display text-lg font-semibold text-foreground">
@@ -48,27 +32,19 @@ const PhysicalProgress = ({
             <PersonStanding className="w-5 h-5 text-category-physical" />
           </div>
           <div className="flex-1">
-            <div className="flex justify-between mb-1">
+            <div className="flex justify-between mb-3">
               <span className="text-sm font-medium">Corrida</span>
-              <span className="text-sm text-muted-foreground">{runningKm} / 5 km</span>
+              <span className="text-sm text-primary font-semibold">{runningKm.toFixed(1)} / 5 km</span>
             </div>
-            <Progress value={(runningKm / 5) * 100} className="h-3" />
+            <Slider
+              value={[runningKm]}
+              onValueChange={(value) => onUpdateRunning(value[0])}
+              max={5}
+              min={0}
+              step={0.1}
+              className="w-full"
+            />
           </div>
-        </div>
-        <div className="flex gap-2">
-          <Input
-            type="number"
-            placeholder="km"
-            value={runningInput}
-            onChange={(e) => setRunningInput(e.target.value)}
-            className="flex-1"
-            min={0}
-            max={5}
-            step={0.1}
-          />
-          <Button onClick={handleRunningSubmit} variant="secondary" size="sm">
-            Atualizar
-          </Button>
         </div>
       </motion.div>
       
@@ -84,26 +60,19 @@ const PhysicalProgress = ({
             <Target className="w-5 h-5 text-category-physical" />
           </div>
           <div className="flex-1">
-            <div className="flex justify-between mb-1">
+            <div className="flex justify-between mb-3">
               <span className="text-sm font-medium">Socos</span>
-              <span className="text-sm text-muted-foreground">{punches} / 1000</span>
+              <span className="text-sm text-primary font-semibold">{punches} / 1000</span>
             </div>
-            <Progress value={(punches / 1000) * 100} className="h-3" />
+            <Slider
+              value={[punches]}
+              onValueChange={(value) => onUpdatePunches(value[0])}
+              max={1000}
+              min={0}
+              step={1}
+              className="w-full"
+            />
           </div>
-        </div>
-        <div className="flex gap-2">
-          <Input
-            type="number"
-            placeholder="quantidade"
-            value={punchesInput}
-            onChange={(e) => setPunchesInput(e.target.value)}
-            className="flex-1"
-            min={0}
-            max={1000}
-          />
-          <Button onClick={handlePunchesSubmit} variant="secondary" size="sm">
-            Atualizar
-          </Button>
         </div>
       </motion.div>
     </div>
