@@ -22,7 +22,19 @@ const LAST_RESET_KEY = "ascencao-last-reset";
 const Index = () => {
   const [missions, setMissions] = useState<Mission[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? JSON.parse(saved) : initialMissions;
+    if (saved) {
+      const savedMissions = JSON.parse(saved) as Mission[];
+      // Merge saved missions with initialMissions to ensure new missions are included
+      const savedIds = new Set(savedMissions.map(m => m.id));
+      const newMissions = initialMissions.filter(m => !savedIds.has(m.id));
+      // Also update existing missions with new data (like updated points)
+      const mergedMissions = savedMissions.map(saved => {
+        const initial = initialMissions.find(m => m.id === saved.id);
+        return initial ? { ...initial, completed: saved.completed } : saved;
+      });
+      return [...mergedMissions, ...newMissions];
+    }
+    return initialMissions;
   });
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   
