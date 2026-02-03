@@ -8,8 +8,8 @@ const Logo = () => {
         <h1 className="font-display text-xl md:text-2xl font-bold tracking-wider text-gradient-gold">
           ASCENÇÃO
         </h1>
-        <p className="font-display text-[10px] md:text-xs tracking-[0.2em] text-primary/80">
-          EVOLUÇÃO INDIVIDUAL
+        <p className="font-display text-[8px] md:text-[10px] tracking-[0.3em] text-primary/60 uppercase">
+          evolution
         </p>
       </div>
     </div>
