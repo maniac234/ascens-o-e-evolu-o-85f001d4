@@ -1,13 +1,13 @@
-import { useState } from "react";
 import { ArrowLeft, BarChart3 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useDailyLog } from "@/hooks/useDailyLog";
 import StatisticsCharts from "@/components/StatisticsCharts";
 import DailyLogDisplay from "@/components/DailyLogDisplay";
+import CumulativeStatsPanel from "@/components/CumulativeStatsPanel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Statistics = () => {
-  const { getSortedLogs } = useDailyLog();
+  const { getSortedLogs, monthlyHistory } = useDailyLog();
   const logs = getSortedLogs();
   
   return (
@@ -37,7 +37,11 @@ const Statistics = () => {
           </div>
         </header>
         
-        <main className="container mx-auto px-4 py-8 max-w-4xl">
+        <main className="container mx-auto px-4 py-8 max-w-4xl space-y-8">
+          {/* Cumulative Stats Panel */}
+          <CumulativeStatsPanel logs={logs} monthlyHistory={monthlyHistory} />
+          
+          {/* Charts by Period */}
           <Tabs defaultValue="weekly" className="space-y-6">
             <TabsList className="w-full grid grid-cols-3">
               <TabsTrigger value="weekly">Semanal</TabsTrigger>
@@ -59,7 +63,7 @@ const Statistics = () => {
           </Tabs>
           
           {/* Historical Logs */}
-          <section className="mt-8">
+          <section>
             <h2 className="font-display text-lg font-semibold mb-4">
               Histórico de Atividades
             </h2>

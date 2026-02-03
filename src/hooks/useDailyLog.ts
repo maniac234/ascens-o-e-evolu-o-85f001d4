@@ -3,6 +3,14 @@ import { DailyLog, CompletedMission, CandleIntention, CandleColor, AstralBodyIns
 import { getCurrentDateKey, useDailyReset } from "./useDailyReset";
 
 const LOGS_STORAGE_KEY = "ascencao-daily-logs";
+const MONTHLY_HISTORY_KEY = "ascencao-monthly-history";
+
+export interface MonthlyStats {
+  month: string; // YYYY-MM
+  totalKm: number;
+  totalPunches: number;
+  totalClona: number;
+}
 
 function getEmptyLog(date: string): DailyLog {
   return {
@@ -32,19 +40,62 @@ function saveAllLogs(logs: Record<string, DailyLog>) {
   localStorage.setItem(LOGS_STORAGE_KEY, JSON.stringify(logs));
 }
 
+function loadMonthlyHistory(): MonthlyStats[] {
+  try {
+    const saved = localStorage.getItem(MONTHLY_HISTORY_KEY);
+    return saved ? JSON.parse(saved) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveMonthlyHistory(history: MonthlyStats[]) {
+  localStorage.setItem(MONTHLY_HISTORY_KEY, JSON.stringify(history));
+}
+
 export function useDailyLog() {
   const [currentDateKey, setCurrentDateKey] = useState(getCurrentDateKey);
   const [allLogs, setAllLogs] = useState<Record<string, DailyLog>>(loadAllLogs);
+  const [monthlyHistory, setMonthlyHistory] = useState<MonthlyStats[]>(loadMonthlyHistory);
   
   const todayLog = allLogs[currentDateKey] || getEmptyLog(currentDateKey);
+  
+  // Check and archive previous month if needed
+  useEffect(() => {
+    const currentMonth = currentDateKey.slice(0, 7); // YYYY-MM
+    const lastArchivedMonth = monthlyHistory[0]?.month;
+    
+    // Get all unique months from logs
+    const logMonths = [...new Set(Object.keys(allLogs).map(date => date.slice(0, 7)))];
+    
+    // Find months that should be archived (not current month, not already archived)
+    logMonths.forEach(month => {
+      if (month !== currentMonth && !monthlyHistory.some(h => h.month === month)) {
+        // Calculate stats for this month
+        const monthLogs = Object.values(allLogs).filter(log => log.date.startsWith(month));
+        if (monthLogs.length > 0) {
+          const stats: MonthlyStats = {
+            month,
+            totalKm: monthLogs.reduce((sum, log) => sum + (log.runningKm || 0), 0),
+            totalPunches: monthLogs.reduce((sum, log) => sum + (log.punches || 0), 0),
+            totalClona: monthLogs.reduce((sum, log) => sum + (log.clonaDrops || 0), 0),
+          };
+          
+          setMonthlyHistory(prev => {
+            const updated = [stats, ...prev].sort((a, b) => b.month.localeCompare(a.month));
+            saveMonthlyHistory(updated);
+            return updated;
+          });
+        }
+      }
+    });
+  }, [currentDateKey, allLogs, monthlyHistory]);
   
   // Handle daily reset
   const handleReset = useCallback(() => {
     const newDateKey = getCurrentDateKey();
     setCurrentDateKey(newDateKey);
   }, []);
-  
-  useDailyReset(handleReset);
   
   // Persist logs
   useEffect(() => {
@@ -255,10 +306,25 @@ export function useDailyLog() {
     return logs.slice(0, days);
   }, [getSortedLogs]);
   
+  // Get monthly cumulative stats
+  const getMonthlyCumulativeStats = useCallback((month?: string) => {
+    const targetMonth = month || currentDateKey.slice(0, 7);
+    const monthLogs = Object.values(allLogs).filter(log => log.date.startsWith(targetMonth));
+    
+    return {
+      month: targetMonth,
+      totalKm: monthLogs.reduce((sum, log) => sum + (log.runningKm || 0), 0),
+      totalPunches: monthLogs.reduce((sum, log) => sum + (log.punches || 0), 0),
+      totalClona: monthLogs.reduce((sum, log) => sum + (log.clonaDrops || 0), 0),
+      daysLogged: monthLogs.length,
+    };
+  }, [allLogs, currentDateKey]);
+  
   return {
     todayLog,
     allLogs,
     currentDateKey,
+    monthlyHistory,
     addCompletedMission,
     removeCompletedMission,
     selectPractice,
@@ -273,5 +339,6 @@ export function useDailyLog() {
     getAllInsights,
     getSortedLogs,
     getLogsForRange,
+    getMonthlyCumulativeStats,
   };
 }
