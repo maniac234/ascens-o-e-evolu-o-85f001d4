@@ -34,7 +34,7 @@ export const initialMissions: Mission[] = [
   // Astral Body (antigo Emotional)
   { id: "ab1", title: "Registrar insight astral", points: 40, completed: false, category: "astralBody" },
   { id: "ab2", title: "Análise de mecanismo astral", points: 35, completed: false, category: "astralBody" },
-  { id: "ab3", title: "Formas pensamentos de guerreiro", points: 90, completed: false, category: "astralBody" },
+  { id: "ab3", title: "Formas pensamentos de guerreiro", points: 100, completed: false, category: "astralBody" },
   
   // Mental - Updated
   { id: "m1", title: "Leitura diária", points: 45, completed: false, category: "mental" },
