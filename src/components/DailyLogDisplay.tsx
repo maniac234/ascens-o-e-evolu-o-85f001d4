@@ -121,14 +121,17 @@ const DailyLogDisplay = ({ logs, maxDisplay = 7 }: DailyLogDisplayProps) => {
                     )}
                     
                     {/* Show progress items */}
-                    {(log.runningKm > 0 || log.punches > 0) && (
+                    {(log.runningKm > 0 || log.punches > 0 || log.clonaDrops > 0) && (
                       <div className="pt-2 border-t border-border">
-                        <p className="text-xs text-muted-foreground mb-2">Progresso Físico</p>
+                        <p className="text-xs text-muted-foreground mb-2">Progresso do Dia</p>
                         {log.runningKm > 0 && (
                           <p className="text-sm">🏃 Corrida: {log.runningKm} km</p>
                         )}
                         {log.punches > 0 && (
                           <p className="text-sm">🥊 Socos: {log.punches}</p>
+                        )}
+                        {log.clonaDrops > 0 && (
+                          <p className="text-sm">💧 Gotas de Clona: {log.clonaDrops}</p>
                         )}
                       </div>
                     )}
