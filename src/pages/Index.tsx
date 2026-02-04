@@ -122,9 +122,21 @@ const Index = () => {
                 <ScoreDisplay totalPoints={totalPoints} level={level} />
               </section>
 
+              {/* Daily Progress Panel - Shows on home */}
+              <section className="mb-8">
+                <PhysicalProgress 
+                  runningKm={todayLog.runningKm} 
+                  punches={todayLog.punches} 
+                  clonaDrops={todayLog.clonaDrops}
+                  onUpdateRunning={updateRunningKm} 
+                  onUpdatePunches={updatePunches}
+                  onUpdateClonaDrops={updateClonaDrops}
+                />
+              </section>
+
               <section>
                 <h2 className="font-display text-xl font-semibold mb-4 text-foreground">Áreas de Desenvolvimento</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {categories.map((category) => {
                     const stats = getCategoryStats(category.id);
                     return (
