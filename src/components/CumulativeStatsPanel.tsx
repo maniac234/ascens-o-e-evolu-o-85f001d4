@@ -54,32 +54,32 @@ const CumulativeStatsPanel = ({ logs, monthlyHistory }: CumulativeStatsPanelProp
           </div>
         </div>
         
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {/* KM Card */}
           <div className="bg-background/50 backdrop-blur-sm rounded-lg p-4 text-center border border-border">
             <Footprints className="w-6 h-6 text-primary mx-auto mb-2" />
-            <div className="text-2xl font-bold text-foreground">
+            <div className="text-2xl sm:text-3xl font-bold text-foreground">
               {currentMonthStats.totalKm.toFixed(1)}
             </div>
-            <div className="text-xs text-muted-foreground mt-1">km corridos</div>
+            <div className="text-xs sm:text-sm text-muted-foreground mt-1">km corridos</div>
           </div>
           
           {/* Punches Card */}
           <div className="bg-background/50 backdrop-blur-sm rounded-lg p-4 text-center border border-border">
             <Flame className="w-6 h-6 text-accent mx-auto mb-2" />
-            <div className="text-2xl font-bold text-foreground">
+            <div className="text-2xl sm:text-3xl font-bold text-foreground">
               {currentMonthStats.totalPunches.toLocaleString()}
             </div>
-            <div className="text-xs text-muted-foreground mt-1">socos</div>
+            <div className="text-xs sm:text-sm text-muted-foreground mt-1">socos</div>
           </div>
           
           {/* Clona Card */}
           <div className="bg-background/50 backdrop-blur-sm rounded-lg p-4 text-center border border-border">
             <Droplets className="w-6 h-6 text-secondary mx-auto mb-2" />
-            <div className="text-2xl font-bold text-foreground">
+            <div className="text-2xl sm:text-3xl font-bold text-foreground">
               {currentMonthStats.totalClona}
             </div>
-            <div className="text-xs text-muted-foreground mt-1">gotas clona</div>
+            <div className="text-xs sm:text-sm text-muted-foreground mt-1">gotas clona</div>
           </div>
         </div>
         
