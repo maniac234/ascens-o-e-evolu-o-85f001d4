@@ -56,6 +56,7 @@ export const initialMissions: Mission[] = [
   // Intraphysical
   { id: "i1", title: "Completar tarefa de trabalho", points: 60, completed: false, category: "intraphysical" },
   { id: "i2", title: "Conectar com um amigo", points: 40, completed: false, category: "intraphysical" },
+   { id: "i3", title: "Banda na Rua", points: 100, completed: false, category: "intraphysical" },
   
   // Astral Reality
   { id: "a1", title: "Lucidez plena em sonho", points: 130, completed: false, category: "astral" },

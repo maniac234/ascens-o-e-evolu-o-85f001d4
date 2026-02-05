@@ -51,6 +51,7 @@ const Index = () => {
     addAstralBodyInsight,
     getSortedLogs,
     currentDateKey,
+     lifetimePoints,
   } = useDailyLog();
 
   // Daily reset at 4AM Brazil time
@@ -88,8 +89,8 @@ const Index = () => {
     }
   }, [missions, addCompletedMission, removeCompletedMission]);
 
-  const totalPoints = missions.filter(m => m.completed).reduce((sum, m) => sum + m.points, 0) + todayLog.totalPoints;
-  const level = Math.floor(Math.max(0, totalPoints) / 1000) + 1;
+   // Use lifetime points for level calculation (perpetual accumulation)
+   const level = Math.floor(Math.max(0, lifetimePoints) / 1000) + 1;
 
   const getCategoryStats = (category: Category) => {
     const categoryMissions = missions.filter(m => m.category === category);
@@ -119,7 +120,7 @@ const Index = () => {
             <>
               <DailyPointsCounter points={todayLog.totalPoints} />
               <section className="mb-8">
-                <ScoreDisplay totalPoints={totalPoints} level={level} />
+               <ScoreDisplay lifetimePoints={lifetimePoints} level={level} />
               </section>
 
               <section>

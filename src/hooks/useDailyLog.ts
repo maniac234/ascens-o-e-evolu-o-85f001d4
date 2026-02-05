@@ -4,6 +4,7 @@ import { getCurrentDateKey, useDailyReset } from "./useDailyReset";
 
 const LOGS_STORAGE_KEY = "ascencao-daily-logs";
 const MONTHLY_HISTORY_KEY = "ascencao-monthly-history";
+ const LIFETIME_POINTS_KEY = "ascencao-lifetime-points";
 
 export interface MonthlyStats {
   month: string; // YYYY-MM
@@ -49,6 +50,19 @@ function loadMonthlyHistory(): MonthlyStats[] {
   }
 }
 
+ function loadLifetimePoints(): number {
+   try {
+     const saved = localStorage.getItem(LIFETIME_POINTS_KEY);
+     return saved ? JSON.parse(saved) : 0;
+   } catch {
+     return 0;
+   }
+ }
+ 
+ function saveLifetimePoints(points: number) {
+   localStorage.setItem(LIFETIME_POINTS_KEY, JSON.stringify(points));
+ }
+ 
 function saveMonthlyHistory(history: MonthlyStats[]) {
   localStorage.setItem(MONTHLY_HISTORY_KEY, JSON.stringify(history));
 }
@@ -57,6 +71,7 @@ export function useDailyLog() {
   const [currentDateKey, setCurrentDateKey] = useState(getCurrentDateKey);
   const [allLogs, setAllLogs] = useState<Record<string, DailyLog>>(loadAllLogs);
   const [monthlyHistory, setMonthlyHistory] = useState<MonthlyStats[]>(loadMonthlyHistory);
+   const [lifetimePoints, setLifetimePoints] = useState<number>(loadLifetimePoints);
   
   const todayLog = allLogs[currentDateKey] || getEmptyLog(currentDateKey);
   
@@ -101,6 +116,11 @@ export function useDailyLog() {
   useEffect(() => {
     saveAllLogs(allLogs);
   }, [allLogs]);
+   
+   // Persist lifetime points
+   useEffect(() => {
+     saveLifetimePoints(lifetimePoints);
+   }, [lifetimePoints]);
   
   // Update today's log
   const updateTodayLog = useCallback((updates: Partial<DailyLog>) => {
@@ -126,6 +146,8 @@ export function useDailyLog() {
         },
       };
     });
+     // Add to lifetime points
+     setLifetimePoints(prev => prev + mission.points);
   }, [currentDateKey]);
   
   // Remove completed mission
@@ -135,6 +157,9 @@ export function useDailyLog() {
       const mission = currentLog.completedMissions.find(m => m.missionId === missionId);
       if (!mission) return prev;
       
+       // Remove from lifetime points (only allowed on same day)
+       setLifetimePoints(prevPoints => prevPoints - mission.points);
+       
       return {
         ...prev,
         [currentDateKey]: {
@@ -153,6 +178,9 @@ export function useDailyLog() {
       if (currentLog.practiceSelected) return prev; // Already selected
       
       const penalties = { practice1: -40, practice2: -90, practice3: -150 };
+       // Add penalty to lifetime points
+       setLifetimePoints(prevPoints => prevPoints + penalties[practice]);
+       
       return {
         ...prev,
         [currentDateKey]: {
@@ -325,6 +353,7 @@ export function useDailyLog() {
     allLogs,
     currentDateKey,
     monthlyHistory,
+     lifetimePoints,
     addCompletedMission,
     removeCompletedMission,
     selectPractice,
