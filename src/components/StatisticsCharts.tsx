@@ -1,13 +1,5 @@
 import { DailyLog, Category } from "@/types/missions";
 import { useMemo } from "react";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Legend,
-  Tooltip,
-} from "recharts";
 
 interface StatisticsChartsProps {
   logs: DailyLog[];
@@ -88,29 +80,105 @@ const StatisticsCharts = ({ logs, period }: StatisticsChartsProps) => {
     ...item,
     percent: Math.round((item.value / totalTasks) * 100),
   }));
-  
-  const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
-    const RADIAN = Math.PI / 180;
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.6;
-    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-    const y = cy + radius * Math.sin(-midAngle * RADIAN);
-    
-    if (percent < 0.05) return null; // Don't show label for very small slices
-    
-    return (
-      <text
-        x={x}
-        y={y}
-        fill="white"
-        textAnchor="middle"
-        dominantBaseline="central"
-        className="font-bold text-sm drop-shadow-lg"
-        style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.8)' }}
-      >
-        {`${Math.round(percent * 100)}%`}
-      </text>
-    );
-  };
+   
+   // Generate 3D pie chart paths
+   const generatePieSlices = () => {
+     const cx = 150;
+     const cy = 140;
+     const radius = 120;
+     const depth = 25; // 3D depth
+     let currentAngle = -90; // Start from top
+     
+     const slices: Array<{
+       path: string;
+       sidePath: string;
+       color: string;
+       darkColor: string;
+       percent: number;
+       midAngle: number;
+       labelX: number;
+       labelY: number;
+     }> = [];
+     
+     chartDataWithPercent.forEach((item) => {
+       const sliceAngle = (item.percent / 100) * 360;
+       const startAngle = currentAngle;
+       const endAngle = currentAngle + sliceAngle;
+       const midAngle = startAngle + sliceAngle / 2;
+       
+       const startRad = (startAngle * Math.PI) / 180;
+       const endRad = (endAngle * Math.PI) / 180;
+       const midRad = (midAngle * Math.PI) / 180;
+       
+       const x1 = cx + radius * Math.cos(startRad);
+       const y1 = cy + radius * Math.sin(startRad);
+       const x2 = cx + radius * Math.cos(endRad);
+       const y2 = cy + radius * Math.sin(endRad);
+       
+       const largeArc = sliceAngle > 180 ? 1 : 0;
+       
+       // Top face path
+       const path = `M ${cx} ${cy} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} Z`;
+       
+       // 3D side path (only for visible sides)
+       let sidePath = "";
+       if (endAngle > 0 && startAngle < 180) {
+         const visibleStart = Math.max(startAngle, 0);
+         const visibleEnd = Math.min(endAngle, 180);
+         const startRadVis = (visibleStart * Math.PI) / 180;
+         const endRadVis = (visibleEnd * Math.PI) / 180;
+         
+         const sx1 = cx + radius * Math.cos(startRadVis);
+         const sy1 = cy + radius * Math.sin(startRadVis);
+         const sx2 = cx + radius * Math.cos(endRadVis);
+         const sy2 = cy + radius * Math.sin(endRadVis);
+         
+         const sideArc = (visibleEnd - visibleStart) > 180 ? 1 : 0;
+         
+         sidePath = `M ${sx1} ${sy1} 
+                     A ${radius} ${radius} 0 ${sideArc} 1 ${sx2} ${sy2} 
+                     L ${sx2} ${sy2 + depth} 
+                     A ${radius} ${radius} 0 ${sideArc} 0 ${sx1} ${sy1 + depth} Z`;
+       }
+       
+       // Label position
+       const labelRadius = radius * 0.65;
+       const labelX = cx + labelRadius * Math.cos(midRad);
+       const labelY = cy + labelRadius * Math.sin(midRad);
+       
+       // Darker color for 3D side
+       const darkColor = darkenColor(item.color, 0.4);
+       
+       slices.push({
+         path,
+         sidePath,
+         color: item.color,
+         darkColor,
+         percent: item.percent,
+         midAngle,
+         labelX,
+         labelY,
+       });
+       
+       currentAngle = endAngle;
+     });
+     
+     return slices;
+   };
+   
+   // Helper to darken HSL color
+   const darkenColor = (hslColor: string, amount: number) => {
+     const match = hslColor.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
+     if (match) {
+       const h = parseInt(match[1]);
+       const s = parseInt(match[2]);
+       const l = Math.max(0, parseInt(match[3]) * (1 - amount));
+       return `hsl(${h}, ${s}%, ${l}%)`;
+     }
+     return hslColor;
+   };
+   
+   const slices = generatePieSlices();
   
   return (
     <div className="bg-card border border-border rounded-xl p-6">
@@ -119,67 +187,101 @@ const StatisticsCharts = ({ logs, period }: StatisticsChartsProps) => {
         <span className="text-sm text-muted-foreground">{totalTasks} tarefas</span>
       </div>
       
-      <div className="h-72">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <defs>
-              {chartDataWithPercent.map((entry, index) => (
-                <linearGradient key={`gradient-${index}`} id={`gradient-${index}`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={entry.color} stopOpacity={1} />
-                  <stop offset="100%" stopColor={entry.color} stopOpacity={0.7} />
-                </linearGradient>
-              ))}
-              <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-                <feDropShadow dx="2" dy="4" stdDeviation="3" floodOpacity="0.4" />
-              </filter>
-            </defs>
-            <Pie
-              data={chartDataWithPercent}
-              cx="50%"
-              cy="50%"
-              innerRadius={0}
-              outerRadius={110}
-              paddingAngle={2}
-              dataKey="value"
-              labelLine={false}
-              label={renderCustomLabel}
-              stroke="hsl(0 0% 10%)"
-              strokeWidth={2}
-              style={{ filter: 'url(#shadow)' }}
-            >
-              {chartDataWithPercent.map((entry, index) => (
-                <Cell 
-                  key={`cell-${index}`} 
-                  fill={`url(#gradient-${index})`}
-                />
-              ))}
-            </Pie>
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "hsl(0 0% 7%)",
-                border: "1px solid hsl(45 30% 20%)",
-                borderRadius: "0.75rem",
-                color: "hsl(45 100% 95%)",
-                boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
-              }}
-              formatter={(value: number, name: string) => [`${value} tarefas`, name]}
-            />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
-      
-      {/* Legend below chart */}
-      <div className="mt-4 grid grid-cols-2 gap-2">
-        {chartDataWithPercent.map((entry, index) => (
-          <div key={index} className="flex items-center gap-2 text-sm">
-            <div 
-              className="w-3 h-3 rounded-sm flex-shrink-0"
-              style={{ backgroundColor: entry.color }}
-            />
-            <span className="text-muted-foreground truncate">{entry.name}</span>
-            <span className="text-foreground font-medium ml-auto">{entry.percent}%</span>
-          </div>
-        ))}
+       <div className="flex flex-col lg:flex-row items-center gap-6">
+         {/* 3D Pie Chart */}
+         <div className="flex-shrink-0">
+           <svg 
+             width="300" 
+             height="300" 
+             viewBox="0 0 300 300"
+             className="drop-shadow-2xl"
+           >
+             <defs>
+               {chartDataWithPercent.map((entry, index) => (
+                 <linearGradient key={`grad-${index}`} id={`pieGrad-${index}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                   <stop offset="0%" stopColor={entry.color} stopOpacity={1} />
+                   <stop offset="50%" stopColor={entry.color} stopOpacity={0.9} />
+                   <stop offset="100%" stopColor={darkenColor(entry.color, 0.2)} stopOpacity={1} />
+                 </linearGradient>
+               ))}
+               <filter id="pie3dShadow" x="-50%" y="-50%" width="200%" height="200%">
+                 <feDropShadow dx="0" dy="8" stdDeviation="8" floodColor="#000" floodOpacity="0.5" />
+               </filter>
+               <filter id="innerGlow">
+                 <feGaussianBlur stdDeviation="2" result="blur" />
+                 <feComposite in="SourceGraphic" in2="blur" operator="over" />
+               </filter>
+             </defs>
+             
+             <g filter="url(#pie3dShadow)">
+               {/* 3D sides (render first, back to front) */}
+               {slices.map((slice, index) => (
+                 slice.sidePath && (
+                   <path
+                     key={`side-${index}`}
+                     d={slice.sidePath}
+                     fill={slice.darkColor}
+                     stroke="hsl(0, 0%, 5%)"
+                     strokeWidth="1"
+                   />
+                 )
+               ))}
+               
+               {/* Top faces */}
+               {slices.map((slice, index) => (
+                 <path
+                   key={`top-${index}`}
+                   d={slice.path}
+                   fill={`url(#pieGrad-${index})`}
+                   stroke="hsl(0, 0%, 8%)"
+                   strokeWidth="2"
+                   className="transition-all duration-300 hover:brightness-110"
+                 />
+               ))}
+               
+               {/* Percentage labels */}
+               {slices.map((slice, index) => (
+                 slice.percent >= 5 && (
+                   <text
+                     key={`label-${index}`}
+                     x={slice.labelX}
+                     y={slice.labelY}
+                     textAnchor="middle"
+                     dominantBaseline="central"
+                     className="font-bold text-base"
+                     fill="white"
+                     style={{ 
+                       textShadow: '2px 2px 4px rgba(0,0,0,0.9)',
+                       fontWeight: 700,
+                     }}
+                   >
+                     {slice.percent}%
+                   </text>
+                 )
+               ))}
+             </g>
+           </svg>
+         </div>
+         
+         {/* Legend beside chart */}
+         <div className="flex-1 space-y-3">
+           {chartDataWithPercent.map((entry, index) => (
+             <div 
+               key={index} 
+               className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/30 transition-colors"
+             >
+               <div 
+                 className="w-4 h-4 rounded-sm flex-shrink-0 shadow-md"
+                 style={{ 
+                   backgroundColor: entry.color,
+                   boxShadow: `0 2px 8px ${entry.color}40`,
+                 }}
+               />
+               <span className="text-foreground font-medium flex-1">{entry.name}</span>
+               <span className="text-primary font-display font-bold text-lg">{entry.percent}%</span>
+             </div>
+           ))}
+         </div>
       </div>
     </div>
   );
