@@ -1,13 +1,13 @@
 import { Trophy } from "lucide-react";
 
 interface ScoreDisplayProps {
-  totalPoints: number;
+   lifetimePoints: number;
   level: number;
 }
 
-const ScoreDisplay = ({ totalPoints, level }: ScoreDisplayProps) => {
+ const ScoreDisplay = ({ lifetimePoints, level }: ScoreDisplayProps) => {
   const nextLevelPoints = level * 1000;
-  const progress = (totalPoints % 1000) / 10;
+   const progress = (lifetimePoints % 1000) / 10;
 
   return (
     <div className="bg-card rounded-xl p-6 card-glow">
@@ -23,7 +23,7 @@ const ScoreDisplay = ({ totalPoints, level }: ScoreDisplayProps) => {
         </div>
         <div className="text-right">
           <p className="text-sm text-muted-foreground">Pontos Totais</p>
-          <p className="font-display text-3xl font-bold text-gradient-gold">{totalPoints.toLocaleString()}</p>
+           <p className="font-display text-3xl font-bold text-gradient-gold">{lifetimePoints.toLocaleString()}</p>
         </div>
       </div>
       
@@ -39,7 +39,7 @@ const ScoreDisplay = ({ totalPoints, level }: ScoreDisplayProps) => {
           />
         </div>
         <p className="text-xs text-muted-foreground text-right">
-          {(totalPoints % 1000).toLocaleString()} / 1.000 pontos
+         {(lifetimePoints % 1000).toLocaleString()} / 1.000 pontos
         </p>
       </div>
     </div>
