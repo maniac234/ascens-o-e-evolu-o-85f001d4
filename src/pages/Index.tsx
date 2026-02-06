@@ -18,23 +18,31 @@ import { getCurrentDateKey } from "@/hooks/useDailyReset";
 
 const STORAGE_KEY = "ascencao-missions";
 const LAST_RESET_KEY = "ascencao-last-reset";
+const CUSTOM_TASKS_KEY = "ascencao-custom-tasks";
 
 const Index = () => {
+  const [customTasks, setCustomTasks] = useState<Mission[]>(() => {
+    const saved = localStorage.getItem(CUSTOM_TASKS_KEY);
+    return saved ? JSON.parse(saved) : [];
+  });
+
   const [missions, setMissions] = useState<Mission[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
+    const customSaved = localStorage.getItem(CUSTOM_TASKS_KEY);
+    const customTasksList: Mission[] = customSaved ? JSON.parse(customSaved) : [];
+    
     if (saved) {
       const savedMissions = JSON.parse(saved) as Mission[];
-      // Merge saved missions with initialMissions to ensure new missions are included
+      const allInitial = [...initialMissions, ...customTasksList];
       const savedIds = new Set(savedMissions.map(m => m.id));
-      const newMissions = initialMissions.filter(m => !savedIds.has(m.id));
-      // Also update existing missions with new data (like updated points)
+      const newMissions = allInitial.filter(m => !savedIds.has(m.id));
       const mergedMissions = savedMissions.map(saved => {
-        const initial = initialMissions.find(m => m.id === saved.id);
+        const initial = allInitial.find(m => m.id === saved.id);
         return initial ? { ...initial, completed: saved.completed } : saved;
       });
       return [...mergedMissions, ...newMissions];
     }
-    return initialMissions;
+    return [...initialMissions, ...customTasksList];
   });
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   
@@ -54,20 +62,39 @@ const Index = () => {
      lifetimePoints,
   } = useDailyLog();
 
+  // Save custom tasks to localStorage
+  useEffect(() => {
+    localStorage.setItem(CUSTOM_TASKS_KEY, JSON.stringify(customTasks));
+  }, [customTasks]);
+
   // Daily reset at 4AM Brazil time
   useEffect(() => {
     const lastReset = localStorage.getItem(LAST_RESET_KEY);
     const today = getCurrentDateKey();
     
     if (lastReset !== today) {
-      setMissions(initialMissions);
+      // Reset missions but keep custom tasks
+      setMissions([...initialMissions, ...customTasks].map(m => ({ ...m, completed: false })));
       localStorage.setItem(LAST_RESET_KEY, today);
     }
-  }, [currentDateKey]);
+  }, [currentDateKey, customTasks]);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(missions));
   }, [missions]);
+
+  const handleAddCustomTask = useCallback((task: { title: string; points: number; category: Category }) => {
+    const newTask: Mission = {
+      id: `custom-${Date.now()}`,
+      title: task.title,
+      points: task.points,
+      category: task.category,
+      completed: false,
+    };
+    
+    setCustomTasks(prev => [...prev, newTask]);
+    setMissions(prev => [...prev, newTask]);
+  }, []);
 
   const toggleMission = useCallback((id: string) => {
     const mission = missions.find(m => m.id === id);
@@ -113,7 +140,7 @@ const Index = () => {
       </div>
 
       <div className="relative z-10">
-        <Header logs={logs} />
+        <Header logs={logs} onAddCustomTask={handleAddCustomTask} />
 
         <main className="container mx-auto px-4 py-8 max-w-4xl">
           {!selectedCategory ? (
