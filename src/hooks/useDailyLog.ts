@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { DailyLog, CompletedMission, CandleIntention, CandleColor, AstralBodyInsight } from "@/types/missions";
 import { getCurrentDateKey, useDailyReset } from "./useDailyReset";
+import { validateDailyLogs, validateMonthlyHistory, validateLifetimePoints } from "@/lib/validation-schemas";
 
 const LOGS_STORAGE_KEY = "ascencao-daily-logs";
 const MONTHLY_HISTORY_KEY = "ascencao-monthly-history";
- const LIFETIME_POINTS_KEY = "ascencao-lifetime-points";
+const LIFETIME_POINTS_KEY = "ascencao-lifetime-points";
 
 export interface MonthlyStats {
   month: string; // YYYY-MM
@@ -31,7 +32,9 @@ function getEmptyLog(date: string): DailyLog {
 function loadAllLogs(): Record<string, DailyLog> {
   try {
     const saved = localStorage.getItem(LOGS_STORAGE_KEY);
-    return saved ? JSON.parse(saved) : {};
+    if (!saved) return {};
+    const parsed = JSON.parse(saved);
+    return validateDailyLogs(parsed);
   } catch {
     return {};
   }
@@ -44,25 +47,29 @@ function saveAllLogs(logs: Record<string, DailyLog>) {
 function loadMonthlyHistory(): MonthlyStats[] {
   try {
     const saved = localStorage.getItem(MONTHLY_HISTORY_KEY);
-    return saved ? JSON.parse(saved) : [];
+    if (!saved) return [];
+    const parsed = JSON.parse(saved);
+    return validateMonthlyHistory(parsed);
   } catch {
     return [];
   }
 }
 
- function loadLifetimePoints(): number {
-   try {
-     const saved = localStorage.getItem(LIFETIME_POINTS_KEY);
-     return saved ? JSON.parse(saved) : 0;
-   } catch {
-     return 0;
-   }
- }
- 
- function saveLifetimePoints(points: number) {
-   localStorage.setItem(LIFETIME_POINTS_KEY, JSON.stringify(points));
- }
- 
+function loadLifetimePoints(): number {
+  try {
+    const saved = localStorage.getItem(LIFETIME_POINTS_KEY);
+    if (!saved) return 0;
+    const parsed = JSON.parse(saved);
+    return validateLifetimePoints(parsed);
+  } catch {
+    return 0;
+  }
+}
+
+function saveLifetimePoints(points: number) {
+  localStorage.setItem(LIFETIME_POINTS_KEY, JSON.stringify(points));
+}
+
 function saveMonthlyHistory(history: MonthlyStats[]) {
   localStorage.setItem(MONTHLY_HISTORY_KEY, JSON.stringify(history));
 }
