@@ -15,6 +15,7 @@ import { useDailyLog } from "@/hooks/useDailyLog";
 import { categories, initialMissions } from "@/data/missions";
 import { Mission, Category } from "@/types/missions";
 import { getCurrentDateKey } from "@/hooks/useDailyReset";
+import { validateMissions, validateCustomTasks } from "@/lib/validation-schemas";
 
 const STORAGE_KEY = "ascencao-missions";
 const LAST_RESET_KEY = "ascencao-last-reset";
@@ -22,27 +23,37 @@ const CUSTOM_TASKS_KEY = "ascencao-custom-tasks";
 
 const Index = () => {
   const [customTasks, setCustomTasks] = useState<Mission[]>(() => {
-    const saved = localStorage.getItem(CUSTOM_TASKS_KEY);
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem(CUSTOM_TASKS_KEY);
+      if (!saved) return [];
+      const parsed = JSON.parse(saved);
+      return validateCustomTasks(parsed);
+    } catch {
+      return [];
+    }
   });
 
   const [missions, setMissions] = useState<Mission[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    const customSaved = localStorage.getItem(CUSTOM_TASKS_KEY);
-    const customTasksList: Mission[] = customSaved ? JSON.parse(customSaved) : [];
-    
-    if (saved) {
-      const savedMissions = JSON.parse(saved) as Mission[];
-      const allInitial = [...initialMissions, ...customTasksList];
-      const savedIds = new Set(savedMissions.map(m => m.id));
-      const newMissions = allInitial.filter(m => !savedIds.has(m.id));
-      const mergedMissions = savedMissions.map(saved => {
-        const initial = allInitial.find(m => m.id === saved.id);
-        return initial ? { ...initial, completed: saved.completed } : saved;
-      });
-      return [...mergedMissions, ...newMissions];
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      const customSaved = localStorage.getItem(CUSTOM_TASKS_KEY);
+      const customTasksList: Mission[] = customSaved ? validateCustomTasks(JSON.parse(customSaved)) : [];
+      
+      if (saved) {
+        const savedMissions = validateMissions(JSON.parse(saved));
+        const allInitial = [...initialMissions, ...customTasksList];
+        const savedIds = new Set(savedMissions.map(m => m.id));
+        const newMissions = allInitial.filter(m => !savedIds.has(m.id));
+        const mergedMissions = savedMissions.map(saved => {
+          const initial = allInitial.find(m => m.id === saved.id);
+          return initial ? { ...initial, completed: saved.completed } : saved;
+        });
+        return [...mergedMissions, ...newMissions];
+      }
+      return [...initialMissions, ...customTasksList];
+    } catch {
+      return [...initialMissions];
     }
-    return [...initialMissions, ...customTasksList];
   });
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   
