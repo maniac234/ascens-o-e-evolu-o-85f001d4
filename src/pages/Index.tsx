@@ -12,6 +12,7 @@ import CandleRituals from "@/components/CandleRituals";
 import AstralInsights from "@/components/AstralInsights";
 import AstralBodyProgress from "@/components/AstralBodyProgress";
 import { useDailyLog } from "@/hooks/useDailyLog";
+import { useClonaBottleHistory } from "@/hooks/useClonaBottleHistory";
 import { categories, initialMissions } from "@/data/missions";
 import { Mission, Category } from "@/types/missions";
 import { getCurrentDateKey } from "@/hooks/useDailyReset";
@@ -70,8 +71,15 @@ const Index = () => {
     addAstralBodyInsight,
     getSortedLogs,
     currentDateKey,
-     lifetimePoints,
+    lifetimePoints,
   } = useDailyLog();
+
+  const {
+    history: clonaBottleHistory,
+    addCompletion: addClonaBottleCompletion,
+    removeLastCompletion: removeClonaBottleCompletion,
+    hasCompletedToday: hasClonaBottleCompletedToday,
+  } = useClonaBottleHistory();
 
   // Save custom tasks to localStorage
   useEffect(() => {
@@ -114,6 +122,15 @@ const Index = () => {
     const newCompleted = !mission.completed;
     setMissions(prev => prev.map(m => m.id === id ? { ...m, completed: newCompleted } : m));
     
+    // Special handling for clona bottle task - track permanently
+    if (id === "ab4") {
+      if (newCompleted) {
+        addClonaBottleCompletion(currentDateKey);
+      } else {
+        removeClonaBottleCompletion(currentDateKey);
+      }
+    }
+    
     if (newCompleted) {
       addCompletedMission({
         missionId: id,
@@ -125,7 +142,7 @@ const Index = () => {
     } else {
       removeCompletedMission(id);
     }
-  }, [missions, addCompletedMission, removeCompletedMission]);
+  }, [missions, addCompletedMission, removeCompletedMission, addClonaBottleCompletion, removeClonaBottleCompletion, currentDateKey]);
 
    // Use lifetime points for level calculation (perpetual accumulation)
    const level = Math.floor(Math.max(0, lifetimePoints) / 1000) + 1;
@@ -151,7 +168,11 @@ const Index = () => {
       </div>
 
       <div className="relative z-10">
-        <Header logs={logs} onAddCustomTask={handleAddCustomTask} />
+        <Header 
+          logs={logs} 
+          onAddCustomTask={handleAddCustomTask} 
+          clonaBottleHistory={clonaBottleHistory}
+        />
 
         <main className="container mx-auto px-4 py-8 max-w-4xl">
           {!selectedCategory ? (
